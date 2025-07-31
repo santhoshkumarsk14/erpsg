@@ -1,0 +1,4 @@
+com\sme\shared\AuditLog.class
+com\sme\shared\CompanyContext.class
+com\sme\shared\ApiResponse.class
+com\sme\shared\AuditLogRepository.class

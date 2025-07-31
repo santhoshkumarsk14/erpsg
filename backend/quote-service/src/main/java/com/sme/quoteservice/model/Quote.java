@@ -1,0 +1,144 @@
+package com.sme.quoteservice.model;
+
+import javax.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
+
+@Entity
+public class Quote {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private Long companyId;
+    private String quoteNumber;
+    private String client;
+    private Double amount;
+    private String status;
+    private LocalDate issueDate;
+    private String pdfUrl;
+    private Boolean convertedToInvoice;
+    private Double subtotal;
+    private Double discount;
+    private Double tax;
+    private Double shipping;
+    private Double grandTotal;
+    private String currency;
+    private String paymentTerms;
+    private String paymentInstructions;
+    private String notes;
+    private String attachments; // Could be a JSON array or separate entity
+    @Embedded
+    private com.sme.shared.PartyDetails sellerDetails;
+    @Embedded
+    @AttributeOverrides({
+        @AttributeOverride(name = "name", column = @Column(name = "buyer_name")),
+        @AttributeOverride(name = "registeredAddress", column = @Column(name = "buyer_registered_address")),
+        @AttributeOverride(name = "uen", column = @Column(name = "buyer_uen")),
+        @AttributeOverride(name = "businessRegNo", column = @Column(name = "buyer_business_reg_no")),
+        @AttributeOverride(name = "phone", column = @Column(name = "buyer_phone")),
+        @AttributeOverride(name = "email", column = @Column(name = "buyer_email")),
+        @AttributeOverride(name = "gstId", column = @Column(name = "buyer_gst_id")),
+        @AttributeOverride(name = "country", column = @Column(name = "buyer_country")),
+        @AttributeOverride(name = "vatId", column = @Column(name = "buyer_vat_id"))
+    })
+    private com.sme.shared.PartyDetails buyerDetails;
+    private String statusHistory; // JSON array of status changes
+    private String approvalWorkflow; // JSON or separate entity
+    private String recurring; // Recurrence pattern
+    private String multiLanguageSupport; // JSON for translations
+    private Double fxRate; // Foreign exchange rate for non-SGD
+    private String fxSource; // Source of FX rate (e.g., MAS, manual)
+    private String bankDetails; // Bank account info
+    private String paynowUEN; // PayNow UEN
+    private String paynowQR; // PayNow QR code (could be a URL or base64)
+    private String cryptoWallet; // Crypto wallet address
+    private String customPaymentInstructions; // Custom instructions
+    private String termsAndConditions; // Link or text for T&Cs
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "parentId", referencedColumnName = "id")
+    private List<com.sme.shared.LineItem> lineItems;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "parentId", referencedColumnName = "id")
+    private java.util.List<com.sme.shared.ApprovalLog> approvalLogs;
+
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "parentId", referencedColumnName = "id")
+    private java.util.List<com.sme.shared.StatusHistoryLog> statusHistoryLogs;
+
+    // Getters and setters
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
+    public Long getCompanyId() { return companyId; }
+    public void setCompanyId(Long companyId) { this.companyId = companyId; }
+    public String getQuoteNumber() { return quoteNumber; }
+    public void setQuoteNumber(String quoteNumber) { this.quoteNumber = quoteNumber; }
+    public String getClient() { return client; }
+    public void setClient(String client) { this.client = client; }
+    public Double getAmount() { return amount; }
+    public void setAmount(Double amount) { this.amount = amount; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public LocalDate getIssueDate() { return issueDate; }
+    public void setIssueDate(LocalDate issueDate) { this.issueDate = issueDate; }
+    public String getPdfUrl() { return pdfUrl; }
+    public void setPdfUrl(String pdfUrl) { this.pdfUrl = pdfUrl; }
+    public Boolean getConvertedToInvoice() { return convertedToInvoice; }
+    public void setConvertedToInvoice(Boolean convertedToInvoice) { this.convertedToInvoice = convertedToInvoice; }
+    public Double getSubtotal() { return subtotal; }
+    public void setSubtotal(Double subtotal) { this.subtotal = subtotal; }
+    public Double getDiscount() { return discount; }
+    public void setDiscount(Double discount) { this.discount = discount; }
+    public Double getTax() { return tax; }
+    public void setTax(Double tax) { this.tax = tax; }
+    public Double getShipping() { return shipping; }
+    public void setShipping(Double shipping) { this.shipping = shipping; }
+    public Double getGrandTotal() { return grandTotal; }
+    public void setGrandTotal(Double grandTotal) { this.grandTotal = grandTotal; }      
+    public String getCurrency() { return currency; }
+    public void setCurrency(String currency) { this.currency = currency; }
+    public String getPaymentTerms() { return paymentTerms; }
+    public void setPaymentTerms(String paymentTerms) { this.paymentTerms = paymentTerms; }
+    public String getPaymentInstructions() { return paymentInstructions; }
+    public void setPaymentInstructions(String paymentInstructions) { this.paymentInstructions = paymentInstructions; }
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
+    public String getAttachments() { return attachments; }
+    public void setAttachments(String attachments) { this.attachments = attachments; }
+    public com.sme.shared.PartyDetails getSellerDetails() { return sellerDetails; }
+    public void setSellerDetails(com.sme.shared.PartyDetails sellerDetails) { this.sellerDetails = sellerDetails; }
+    public com.sme.shared.PartyDetails getBuyerDetails() { return buyerDetails; }
+    public void setBuyerDetails(com.sme.shared.PartyDetails buyerDetails) { this.buyerDetails = buyerDetails; }
+    public String getStatusHistory() { return statusHistory; }
+    public void setStatusHistory(String statusHistory) { this.statusHistory = statusHistory; }
+    public String getApprovalWorkflow() { return approvalWorkflow; }
+    public void setApprovalWorkflow(String approvalWorkflow) { this.approvalWorkflow = approvalWorkflow; }  
+    public String getRecurring() { return recurring; }
+    public void setRecurring(String recurring) { this.recurring = recurring; }
+    public String getMultiLanguageSupport() { return multiLanguageSupport; }
+    public void setMultiLanguageSupport(String multiLanguageSupport) { this.multiLanguageSupport = multiLanguageSupport; }
+    public Double getFxRate() { return fxRate; }
+    public void setFxRate(Double fxRate) { this.fxRate = fxRate; }
+    public String getFxSource() { return fxSource; }
+    public void setFxSource(String fxSource) { this.fxSource = fxSource; }
+    public String getBankDetails() { return bankDetails; }
+    public void setBankDetails(String bankDetails) { this.bankDetails = bankDetails; }
+    public String getPaynowUEN() { return paynowUEN; }
+    public void setPaynowUEN(String paynowUEN) { this.paynowUEN = paynowUEN; }
+    public String getPaynowQR() { return paynowQR; }
+    public void setPaynowQR(String paynowQR) { this.paynowQR = paynowQR; }
+    public String getCryptoWallet() { return cryptoWallet; }
+    public void setCryptoWallet(String cryptoWallet) { this.cryptoWallet = cryptoWallet; }
+    public String getCustomPaymentInstructions() { return customPaymentInstructions; }
+    public void setCustomPaymentInstructions(String customPaymentInstructions) { this.customPaymentInstructions = customPaymentInstructions; }
+    public String getTermsAndConditions() { return termsAndConditions; }
+    public void setTermsAndConditions(String termsAndConditions) { this.termsAndConditions = termsAndConditions; }
+    public List<com.sme.shared.LineItem> getLineItems() { return lineItems; }
+    public void setLineItems(List<com.sme.shared.LineItem> lineItems) { this.lineItems = lineItems; }
+    public java.util.List<com.sme.shared.ApprovalLog> getApprovalLogs() { return approvalLogs; }
+    public void setApprovalLogs(java.util.List<com.sme.shared.ApprovalLog> approvalLogs) { this.approvalLogs = approvalLogs; }
+    public java.util.List<com.sme.shared.StatusHistoryLog> getStatusHistoryLogs() { return statusHistoryLogs; }
+    public void setStatusHistoryLogs(java.util.List<com.sme.shared.StatusHistoryLog> statusHistoryLogs) { this.statusHistoryLogs = statusHistoryLogs; }
+        
+} 

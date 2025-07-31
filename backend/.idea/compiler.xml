@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="shared" />
+        <module name="payroll-service" />
+        <module name="timesheet-service" />
+        <module name="appendix-service" />
+        <module name="invoice-service" />
+        <module name="api-gateway" />
+        <module name="leave-service" />
+        <module name="tools-equipment-service" />
+        <module name="user-service" />
+        <module name="company-service" />
+        <module name="quote-service" />
+        <module name="procurement-service" />
+      </profile>
+    </annotationProcessing>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="api-gateway" options="" />
+      <module name="company-service" options="" />
+      <module name="timesheet-service" options="" />
+      <module name="user-service" options="" />
+    </option>
+  </component>
+</project>
