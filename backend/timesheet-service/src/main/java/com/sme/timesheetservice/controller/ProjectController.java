@@ -28,14 +28,14 @@ public class ProjectController {
 
     @GetMapping("/company/{companyId}")
     public ApiResponse<List<Project>> getProjectsByCompanyId(@PathVariable String companyId) {
-        return new ApiResponse<>(true, "Fetched projects", projectService.getProjectsByCompanyId(companyId));
+        return new ApiResponse<>(true, "Fetched projects", projectService.getProjectsByCompanyId(Long.parseLong(companyId)));
     }
 
     @GetMapping("/company/{companyId}/status/{status}")
     public ApiResponse<List<Project>> getProjectsByCompanyIdAndStatus(
             @PathVariable String companyId, 
             @PathVariable ProjectStatus status) {
-        return new ApiResponse<>(true, "Fetched projects", projectService.getProjectsByCompanyIdAndStatus(companyId, status));
+        return new ApiResponse<>(true, "Fetched projects", projectService.getProjectsByCompanyIdAndStatus(Long.parseLong(companyId), status));
     }
 
     @PostMapping

@@ -28,7 +28,7 @@ public class ProjectResponse {
         response.setId(project.getId());
         response.setName(project.getName());
         response.setDescription(project.getDescription());
-        response.setCompanyId(project.getCompanyId());
+        response.setCompanyId(project.getCompanyId().toString());
         response.setStartDate(project.getStartDate());
         response.setEndDate(project.getEndDate());
         response.setStatus(project.getStatus());

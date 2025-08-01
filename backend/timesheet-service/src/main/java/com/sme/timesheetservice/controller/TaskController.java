@@ -35,12 +35,20 @@ public class TaskController {
 
     @PostMapping
     public ApiResponse<Task> createTask(@Valid @RequestBody TaskRequest taskRequest) {
-        return new ApiResponse<>(true, "Created task", taskService.createTask(taskRequest));
+        Task task = new Task();
+        task.setName(taskRequest.getName());
+        task.setDescription(taskRequest.getDescription());
+        task.setProjectId(taskRequest.getProjectId());
+        return new ApiResponse<>(true, "Created task", taskService.createTask(task));
     }
 
     @PutMapping("/{id}")
     public ApiResponse<Task> updateTask(@PathVariable String id, @Valid @RequestBody TaskRequest taskRequest) {
-        return new ApiResponse<>(true, "Updated task", taskService.updateTask(id, taskRequest));
+        Task task = new Task();
+        task.setName(taskRequest.getName());
+        task.setDescription(taskRequest.getDescription());
+        task.setProjectId(taskRequest.getProjectId());
+        return new ApiResponse<>(true, "Updated task", taskService.updateTask(id, task));
     }
 
     @DeleteMapping("/{id}")

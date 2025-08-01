@@ -1,9 +1,9 @@
 package com.sme.timesheetservice.service.impl;
 
+import com.sme.timesheetservice.context.CompanyContext;
 import com.sme.timesheetservice.exception.ResourceNotFoundException;
 import com.sme.timesheetservice.model.Task;
 import com.sme.timesheetservice.model.TaskStatus;
-import com.sme.timesheetservice.payload.request.TaskRequest;
 import com.sme.timesheetservice.repository.TaskRepository;
 import com.sme.timesheetservice.service.ProjectService;
 import com.sme.timesheetservice.service.TaskService;
@@ -22,39 +22,14 @@ public class TaskServiceImpl implements TaskService {
     private ProjectService projectService;
 
     @Override
-    public Task createTask(TaskRequest taskRequest) {
-        // Verify that the project exists
-        projectService.getProjectById(taskRequest.getProjectId());
-        
-        Task task = new Task();
-        task.setName(taskRequest.getName());
-        task.setDescription(taskRequest.getDescription());
-        task.setProjectId(taskRequest.getProjectId());
-        task.setStatus(TaskStatus.PENDING);
-        
-        return taskRepository.save(task);
+    public List<Task> getAllTasksForCurrentTenant() {
+        return taskRepository.findAllByCompanyId(CompanyContext.getCompanyId());
     }
 
     @Override
-    public Task updateTask(String id, TaskRequest taskRequest) {
-        Task task = getTaskById(id);
-        
-        // If project ID is changing, verify the new project exists
-        if (!task.getProjectId().equals(taskRequest.getProjectId())) {
-            projectService.getProjectById(taskRequest.getProjectId());
-        }
-        
-        task.setName(taskRequest.getName());
-        task.setDescription(taskRequest.getDescription());
-        task.setProjectId(taskRequest.getProjectId());
-        
-        return taskRepository.save(task);
-    }
-
-    @Override
-    public Task getTaskById(String id) {
-        return taskRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + id));
+    public Task getTaskById(String taskId) {
+        return taskRepository.findById(taskId)
+                .orElseThrow(() -> new ResourceNotFoundException("Task not found with id: " + taskId));
     }
 
     @Override
@@ -68,13 +43,30 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTasksByProjectIds(List<String> projectIds) {
-        return taskRepository.findByProjectIdIn(projectIds);
+    public Task createTask(Task task) {
+        projectService.getProjectById(task.getProjectId());
+        task.setCompanyId(CompanyContext.getCompanyId());
+        return taskRepository.save(task);
     }
 
     @Override
-    public void deleteTask(String id) {
-        Task task = getTaskById(id);
+    public Task updateTask(String taskId, Task taskDetails) {
+        Task task = getTaskById(taskId);
+
+        if (!task.getProjectId().equals(taskDetails.getProjectId())) {
+            projectService.getProjectById(taskDetails.getProjectId());
+        }
+
+        task.setName(taskDetails.getName());
+        task.setDescription(taskDetails.getDescription());
+        task.setProjectId(taskDetails.getProjectId());
+
+        return taskRepository.save(task);
+    }
+
+    @Override
+    public void deleteTask(String taskId) {
+        Task task = getTaskById(taskId);
         task.setStatus(TaskStatus.CANCELLED);
         taskRepository.save(task);
     }

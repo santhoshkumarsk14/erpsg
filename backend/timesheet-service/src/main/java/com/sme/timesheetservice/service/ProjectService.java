@@ -9,8 +9,8 @@ public interface ProjectService {
     Project createProject(Project project);
     Project updateProject(String projectId, Project project);
     Project getProjectById(String id);
-    List<Project> getProjectsByCompanyId(String companyId);
-    List<Project> getProjectsByCompanyIdAndStatus(String companyId, ProjectStatus status);
+    List<Project> getProjectsByCompanyId(Long companyId);
+    List<Project> getProjectsByCompanyIdAndStatus(Long companyId, ProjectStatus status);
     void deleteProject(String projectId);
-    boolean existsByNameAndCompanyId(String name, String companyId);
+    boolean existsByNameAndCompanyId(String name, Long companyId);
 }

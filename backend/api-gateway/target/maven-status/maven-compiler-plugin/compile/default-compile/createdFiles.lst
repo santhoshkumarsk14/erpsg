@@ -1,5 +1,5 @@
-com\sme\apigateway\config\GatewayConfig.class
-com\sme\apigateway\filter\AuthenticationFilter$Config.class
-com\sme\apigateway\util\JwtUtil.class
-com\sme\apigateway\ApiGatewayApplication.class
-com\sme\apigateway\filter\AuthenticationFilter.class
+com/sme/apigateway/util/JwtUtil.class
+com/sme/apigateway/filter/AuthenticationFilter$Config.class
+com/sme/apigateway/filter/AuthenticationFilter.class
+com/sme/apigateway/config/GatewayConfig.class
+com/sme/apigateway/ApiGatewayApplication.class
