@@ -1,11 +1,11 @@
 package com.sme.shared;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "audit_trail_logs")
-public class AuditTrailLog {
+@Table(name = "status_history_logs")
+public class StatusHistoryLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,11 +17,10 @@ public class AuditTrailLog {
     private String parentType; // 'INVOICE', 'QUOTE', 'PO'
 
     @Column(nullable = false)
-    private String action; // CREATE, UPDATE, DELETE, APPROVE, EXPORT, SEND, etc.
+    private String oldStatus;
 
-    private String fieldName;
-    private String oldValue;
-    private String newValue;
+    @Column(nullable = false)
+    private String newStatus;
 
     @Column(nullable = false)
     private Long changedBy;
@@ -31,7 +30,7 @@ public class AuditTrailLog {
 
     private String remarks;
 
-    public AuditTrailLog() {
+    public StatusHistoryLog() {
         this.changedAt = LocalDateTime.now();
     }
 
@@ -42,14 +41,10 @@ public class AuditTrailLog {
     public void setParentId(Long parentId) { this.parentId = parentId; }
     public String getParentType() { return parentType; }
     public void setParentType(String parentType) { this.parentType = parentType; }
-    public String getAction() { return action; }
-    public void setAction(String action) { this.action = action; }
-    public String getFieldName() { return fieldName; }
-    public void setFieldName(String fieldName) { this.fieldName = fieldName; }
-    public String getOldValue() { return oldValue; }
-    public void setOldValue(String oldValue) { this.oldValue = oldValue; }
-    public String getNewValue() { return newValue; }
-    public void setNewValue(String newValue) { this.newValue = newValue; }
+    public String getOldStatus() { return oldStatus; }
+    public void setOldStatus(String oldStatus) { this.oldStatus = oldStatus; }
+    public String getNewStatus() { return newStatus; }
+    public void setNewStatus(String newStatus) { this.newStatus = newStatus; }
     public Long getChangedBy() { return changedBy; }
     public void setChangedBy(Long changedBy) { this.changedBy = changedBy; }
     public LocalDateTime getChangedAt() { return changedAt; }

@@ -9,8 +9,12 @@ import com.sme.timesheetservice.repository.WorkingHourConfigRepository;
 import com.sme.timesheetservice.service.TaskService;
 import com.sme.timesheetservice.service.TimesheetService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.util.List;
 import com.sme.timesheetservice.context.CompanyContext;
@@ -27,6 +31,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 @Service
 public class TimesheetServiceImpl implements TimesheetService {
 
+    private static final double STANDARD_WORK_HOURS = 8.0;
+
     @Autowired
     private TimesheetRepository timesheetRepository;
 
@@ -42,13 +48,38 @@ public class TimesheetServiceImpl implements TimesheetService {
     @Override
     public Timesheet createTimesheet(Timesheet timesheet) {
         timesheet.setCompanyId(CompanyContext.getCompanyId());
-        WorkingHourConfig config = workingHourConfigRepository.findByCompanyId(timesheet.getCompanyId());
-        // Auto-calculate hours (example logic, adjust as needed)
-        java.time.Duration duration = java.time.Duration.between(timesheet.getStartTime(), timesheet.getEndTime());
+        // WorkingHourConfig config = workingHourConfigRepository.findByCompanyId(timesheet.getCompanyId());
+
+        Duration duration = Duration.between(timesheet.getStartTime(), timesheet.getEndTime());
         double totalHours = duration.toMinutes() / 60.0;
         timesheet.setTotalHr(totalHours);
-        // Calculate baseHr, otHr, satHr, sunHr based on config and timesheet.inspDate
-        // ...
+
+        LocalDate inspectionDate = timesheet.getInspDate();
+        DayOfWeek dayOfWeek = inspectionDate.getDayOfWeek();
+
+        double baseHr = 0;
+        double otHr = 0;
+        double satHr = 0;
+        double sunHr = 0;
+
+        if (dayOfWeek == DayOfWeek.SATURDAY) {
+            satHr = totalHours;
+        } else if (dayOfWeek == DayOfWeek.SUNDAY) {
+            sunHr = totalHours;
+        } else { // Weekday
+            if (totalHours > STANDARD_WORK_HOURS) {
+                baseHr = STANDARD_WORK_HOURS;
+                otHr = totalHours - STANDARD_WORK_HOURS;
+            } else {
+                baseHr = totalHours;
+            }
+        }
+
+        timesheet.setBaseHr(baseHr);
+        timesheet.setOtHr(otHr);
+        timesheet.setSatHr(satHr);
+        timesheet.setSunHr(sunHr);
+
         return timesheetRepository.save(timesheet);
     }
 
@@ -117,7 +148,7 @@ public class TimesheetServiceImpl implements TimesheetService {
 
     @Override
     public List<Timesheet> getTimesheetsByCompanyId(String companyId) {
-        return timesheetRepository.findByCompanyId(companyId);
+        return null; // This method is not paginated, returning null to avoid confusion
     }
 
     @Override
@@ -126,19 +157,20 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public Timesheet submitTimesheet(String id, String userId) {
-        Timesheet timesheet = getTimesheetByIdAndUserId(id, userId);
+    public Timesheet submitTimesheet(String id, Long userId, String remarks) {
+        Timesheet timesheet = getTimesheetById(id);
         
         if (timesheet.getStatus() != TimesheetStatus.PENDING && timesheet.getStatus() != TimesheetStatus.REJECTED) {
             throw new IllegalStateException("Cannot submit timesheet that is not in PENDING or REJECTED status");
         }
         
         timesheet.setStatus(TimesheetStatus.SUBMITTED);
+        timesheet.setRemarks(remarks);
         return timesheetRepository.save(timesheet);
     }
 
     @Override
-    public Timesheet approveTimesheet(String id) {
+    public Timesheet approveTimesheet(String id, Long approverId, String remarks) {
         Timesheet timesheet = getTimesheetById(id);
         
         if (timesheet.getStatus() != TimesheetStatus.SUBMITTED) {
@@ -146,11 +178,20 @@ public class TimesheetServiceImpl implements TimesheetService {
         }
         
         timesheet.setStatus(TimesheetStatus.APPROVED);
+        timesheet.setRemarks(remarks);
+
+        ApprovalLog log = new ApprovalLog();
+        log.setTimesheetId(id);
+        log.setApproverId(approverId);
+        log.setAction("APPROVED");
+        log.setRemarks(remarks);
+        approvalLogRepository.save(log);
+
         return timesheetRepository.save(timesheet);
     }
 
     @Override
-    public Timesheet rejectTimesheet(String id, String reason) {
+    public Timesheet rejectTimesheet(String id, Long approverId, String remarks) {
         Timesheet timesheet = getTimesheetById(id);
         
         if (timesheet.getStatus() != TimesheetStatus.SUBMITTED) {
@@ -158,7 +199,15 @@ public class TimesheetServiceImpl implements TimesheetService {
         }
         
         timesheet.setStatus(TimesheetStatus.REJECTED);
-        // Could store the reason in a separate field or in the description
+        timesheet.setRemarks(remarks);
+
+        ApprovalLog log = new ApprovalLog();
+        log.setTimesheetId(id);
+        log.setApproverId(approverId);
+        log.setAction("REJECTED");
+        log.setRemarks(remarks);
+        approvalLogRepository.save(log);
+
         return timesheetRepository.save(timesheet);
     }
 
@@ -175,9 +224,21 @@ public class TimesheetServiceImpl implements TimesheetService {
     }
 
     @Override
-    public List<Timesheet> getAllTimesheetsForCurrentTenant() {
+    public Page<Timesheet> getAllTimesheetsForCurrentTenant(Pageable pageable) {
         Long companyId = CompanyContext.getCompanyId();
-        return timesheetRepository.findByCompanyId(companyId != null ? companyId.toString() : null);
+        return timesheetRepository.findByCompanyId(companyId, pageable);
+    }
+
+    @Override
+    public Timesheet updateTimesheetStatus(String id, String status) {
+        Timesheet timesheet = getTimesheetById(id);
+        try {
+            TimesheetStatus newStatus = TimesheetStatus.valueOf(status.toUpperCase());
+            timesheet.setStatus(newStatus);
+            return timesheetRepository.save(timesheet);
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException("Invalid status value: " + status);
+        }
     }
 
     @Override

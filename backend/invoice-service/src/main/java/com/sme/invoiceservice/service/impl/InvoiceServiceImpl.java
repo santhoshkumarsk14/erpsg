@@ -17,7 +17,7 @@ import java.math.BigDecimal;
 import com.sme.shared.LineItem;
 import com.sme.shared.ApprovalLog;
 import com.sme.shared.StatusHistoryLog;
-import com.sme.shared.AuditTrailLog;
+import com.sme.shared.AuditLog;
 
 @Service
 public class InvoiceServiceImpl implements InvoiceService {
@@ -193,7 +193,7 @@ public class InvoiceServiceImpl implements InvoiceService {
     }
 
     @Override
-    public java.util.List<AuditTrailLog> getAuditTrailLogs(Long invoiceId) {
+    public java.util.List<AuditLog> getAuditTrailLogs(Long invoiceId) {
         Invoice invoice = invoiceRepository.findById(invoiceId).orElseThrow();
         return invoice.getAuditTrailLogs() != null ? invoice.getAuditTrailLogs() : java.util.Collections.emptyList();
     }
@@ -263,12 +263,12 @@ public class InvoiceServiceImpl implements InvoiceService {
 
     private void logAuditTrail(Invoice invoice, String action, Invoice oldInvoice, Invoice newInvoice, Long userId, String remarks) {
         if (invoice.getAuditTrailLogs() == null) invoice.setAuditTrailLogs(new java.util.ArrayList<>());
-        java.util.List<AuditTrailLog> logs = compareInvoicesForAudit(oldInvoice, newInvoice, action, userId, remarks);
+        java.util.List<AuditLog> logs = compareInvoicesForAudit(oldInvoice, newInvoice, action, userId, remarks);
         invoice.getAuditTrailLogs().addAll(logs);
     }
 
-    private java.util.List<AuditTrailLog> compareInvoicesForAudit(Invoice oldInv, Invoice newInv, String action, Long userId, String remarks) {
-        java.util.List<AuditTrailLog> logs = new java.util.ArrayList<>();
+    private java.util.List<AuditLog> compareInvoicesForAudit(Invoice oldInv, Invoice newInv, String action, Long userId, String remarks) {
+        java.util.List<AuditLog> logs = new java.util.ArrayList<>();
         if (oldInv == null) {
             // Log all fields as created
             java.lang.reflect.Field[] fields = Invoice.class.getDeclaredFields();
@@ -277,7 +277,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                 try {
                     Object newValue = field.get(newInv);
                     if (newValue != null) {
-                        AuditTrailLog log = new AuditTrailLog();
+                        AuditLog log = new AuditLog();
                         log.setParentId(newInv.getId());
                         log.setParentType("INVOICE");
                         log.setAction(action);
@@ -299,7 +299,7 @@ public class InvoiceServiceImpl implements InvoiceService {
                     Object newValue = field.get(newInv);
                     if (oldValue == null && newValue == null) continue;
                     if (oldValue == null || newValue == null || !oldValue.equals(newValue)) {
-                        AuditTrailLog log = new AuditTrailLog();
+                        AuditLog log = new AuditLog();
                         log.setParentId(newInv.getId());
                         log.setParentType("INVOICE");
                         log.setAction(action);

@@ -1,42 +1,63 @@
 import React, { useEffect, useState } from 'react';
-import { getTimesheets, approveTimesheet, rejectTimesheet, downloadTimesheetExcel } from '../../services/timesheetService';
+import timesheetService, { approveTimesheet, rejectTimesheet, downloadTimesheetExcel, Timesheet } from '../../services/timesheetService';
+import { useAuth } from '../../contexts/AuthContext';
 
 const TimesheetList: React.FC = () => {
-  const [timesheets, setTimesheets] = useState<any[]>([]);
+  const [timesheets, setTimesheets] = useState<Timesheet[]>([]);
   const [loading, setLoading] = useState(true);
   const [downloadingExcel, setDownloadingExcel] = useState<{ [key: string]: boolean }>({});
+  const [page, setPage] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const { user } = useAuth();
 
   useEffect(() => {
-    fetchTimesheets();
-  }, []);
+    fetchTimesheets(page);
+  }, [page]);
 
-  const fetchTimesheets = async () => {
+  const fetchTimesheets = async (currentPage: number) => {
     setLoading(true);
-    const res = await getTimesheets();
-    setTimesheets(res.data.data);
+    try {
+      const res = await timesheetService.getTimesheets({ page: currentPage, size: 10 });
+      setTimesheets(res.content);
+      setTotalPages(res.totalPages);
+    } catch (error) {
+      console.error("Failed to fetch timesheets", error);
+    }
     setLoading(false);
   };
 
-  const handleApprove = async (id: number, approverId: number) => {
-    await approveTimesheet(id, approverId);
-    fetchTimesheets();
+  const handleApprove = async (id: string) => {
+    if (!user) return alert("You must be logged in.");
+    const remarks = prompt("Enter approval remarks (optional):");
+    if (remarks !== null) {
+      await approveTimesheet(id, user.id, remarks || '');
+      fetchTimesheets(page);
+    }
   };
 
-  const handleReject = async (id: number, approverId: number) => {
-    await rejectTimesheet(id, approverId);
-    fetchTimesheets();
+  const handleReject = async (id: string) => {
+    if (!user) return alert("You must be logged in.");
+    const remarks = prompt("Enter rejection remarks:");
+    if (remarks) {
+      await rejectTimesheet(id, user.id, remarks);
+      fetchTimesheets(page);
+    }
   };
 
   const handleDownloadExcel = async (id: string) => {
     setDownloadingExcel(d => ({ ...d, [id]: true }));
-    const res = await downloadTimesheetExcel(id);
-    const url = window.URL.createObjectURL(new Blob([res.data], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.setAttribute('download', `timesheet-${id}.xlsx`);
-    document.body.appendChild(link);
-    link.click();
-    link.parentNode?.removeChild(link);
+    try {
+      const response = await downloadTimesheetExcel(id);
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `timesheet-${id}.xlsx`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+    } catch (error) {
+      console.error("Failed to download excel", error);
+    }
     setDownloadingExcel(d => ({ ...d, [id]: false }));
   };
 
@@ -93,14 +114,25 @@ const TimesheetList: React.FC = () => {
               <td>{ts.status}</td>
               <td>{ts.remarks}</td>
               <td>
-                <button onClick={() => handleApprove(ts.id, 1)}>Approve</button>
-                <button onClick={() => handleReject(ts.id, 1)}>Reject</button>
+                <button onClick={() => handleApprove(ts.id)}>Approve</button>
+                <button onClick={() => handleReject(ts.id)}>Reject</button>
                 <button onClick={() => handleDownloadExcel(ts.id)} disabled={downloadingExcel[ts.id]}>Download Excel</button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
+      <div>
+        <button onClick={() => setPage(p => p - 1)} disabled={page === 0}>
+          Previous
+        </button>
+        <span>
+          Page {page + 1} of {totalPages}
+        </span>
+        <button onClick={() => setPage(p => p + 1)} disabled={page >= totalPages - 1}>
+          Next
+        </button>
+      </div>
     </div>
   );
 };

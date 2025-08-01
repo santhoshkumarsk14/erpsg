@@ -8,7 +8,7 @@ public class ApprovalLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private Long timesheetId;
+    private String timesheetId;
     private Long approverId;
     private String action; // APPROVED, REJECTED, etc.
     private String remarks;
@@ -16,8 +16,8 @@ public class ApprovalLog {
 
     public Long getId() { return id; }  
     public void setId(Long id) { this.id = id; }
-    public Long getTimesheetId() { return timesheetId; }
-    public void setTimesheetId(Long timesheetId) { this.timesheetId = timesheetId; }
+    public String getTimesheetId() { return timesheetId; }
+    public void setTimesheetId(String timesheetId) { this.timesheetId = timesheetId; }
     public Long getApproverId() { return approverId; }
     public void setApproverId(Long approverId) { this.approverId = approverId; }
     public String getAction() { return action; }

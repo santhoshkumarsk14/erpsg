@@ -1,6 +1,6 @@
 package com.sme.shared;
 
-import javax.persistence.Embeddable;
+import jakarta.persistence.Embeddable;
 
 @Embeddable
 public class PartyDetails {

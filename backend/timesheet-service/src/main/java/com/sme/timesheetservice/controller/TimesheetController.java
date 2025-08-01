@@ -4,6 +4,8 @@ import com.sme.timesheetservice.model.Timesheet;
 import com.sme.timesheetservice.service.TimesheetService;
 import com.sme.shared.ApiResponse;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import org.springframework.http.ResponseEntity;
@@ -17,8 +19,8 @@ public class TimesheetController {
     private TimesheetService timesheetService;
 
     @GetMapping
-    public ApiResponse<List<Timesheet>> getAllTimesheets() {
-        return new ApiResponse<>(true, "Fetched timesheets", timesheetService.getAllTimesheetsForCurrentTenant());
+    public ApiResponse<Page<Timesheet>> getAllTimesheets(Pageable pageable) {
+        return new ApiResponse<>(true, "Fetched timesheets", timesheetService.getAllTimesheetsForCurrentTenant(pageable));
     }
 
     @GetMapping("/{id}/pdf")
@@ -45,22 +47,22 @@ public class TimesheetController {
     }
 
     @PostMapping("/{id}/submit")
-    public ApiResponse<Timesheet> submitTimesheet(@PathVariable Long id, @RequestParam Long userId, @RequestParam(required = false) String remarks) {
+    public ApiResponse<Timesheet> submitTimesheet(@PathVariable String id, @RequestParam Long userId, @RequestParam(required = false) String remarks) {
         return new ApiResponse<>(true, "Submitted timesheet", timesheetService.submitTimesheet(id, userId, remarks));
     }
 
     @PostMapping("/{id}/approve")
-    public ApiResponse<Timesheet> approveTimesheet(@PathVariable Long id, @RequestParam Long approverId, @RequestParam(required = false) String remarks) {
+    public ApiResponse<Timesheet> approveTimesheet(@PathVariable String id, @RequestParam Long approverId, @RequestParam(required = false) String remarks) {
         return new ApiResponse<>(true, "Approved timesheet", timesheetService.approveTimesheet(id, approverId, remarks));
     }
 
     @PostMapping("/{id}/reject")
-    public ApiResponse<Timesheet> rejectTimesheet(@PathVariable Long id, @RequestParam Long approverId, @RequestParam(required = false) String remarks) {
+    public ApiResponse<Timesheet> rejectTimesheet(@PathVariable String id, @RequestParam Long approverId, @RequestParam(required = false) String remarks) {
         return new ApiResponse<>(true, "Rejected timesheet", timesheetService.rejectTimesheet(id, approverId, remarks));
     }
 
     @PatchMapping("/{id}/status")
-    public ApiResponse<Timesheet> updateStatus(@PathVariable Long id, @RequestParam String status) {
+    public ApiResponse<Timesheet> updateStatus(@PathVariable String id, @RequestParam String status) {
         return new ApiResponse<>(true, "Updated status", timesheetService.updateTimesheetStatus(id, status));
     }
 }

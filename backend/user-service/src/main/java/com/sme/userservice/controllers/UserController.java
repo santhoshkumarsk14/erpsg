@@ -88,7 +88,7 @@ public class UserController {
         }
         
         User updatedUser = userRepository.save(user);
-        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "USER_UPDATE", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "USER_UPDATE", null, null, java.time.LocalDateTime.now(), null));
         return ResponseEntity.ok(updatedUser);
     }
 
@@ -120,7 +120,7 @@ public class UserController {
         user.setPassword(passwordEncoder.encode(newPassword));
         user.setUpdatedAt(LocalDateTime.now());
         userRepository.save(user);
-        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "PASSWORD_CHANGE", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "PASSWORD_CHANGE", null, null, java.time.LocalDateTime.now(), null));
         return ResponseEntity.ok(Map.of("message", "Password changed successfully"));
     }
 
@@ -132,7 +132,7 @@ public class UserController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setTwoFaEnabled(true);
         userRepository.save(user);
-        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "2FA_ENABLED", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "2FA_ENABLED", null, null, java.time.LocalDateTime.now(), null));
         return ResponseEntity.ok(Map.of("message", "2FA enabled"));
     }
 
@@ -144,7 +144,7 @@ public class UserController {
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
         user.setTwoFaEnabled(false);
         userRepository.save(user);
-        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "2FA_DISABLED", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user.getCompanyId(), user.getId(), "USER", null, "2FA_DISABLED", null, null, java.time.LocalDateTime.now(), null));
         return ResponseEntity.ok(Map.of("message", "2FA disabled"));
     }
 }

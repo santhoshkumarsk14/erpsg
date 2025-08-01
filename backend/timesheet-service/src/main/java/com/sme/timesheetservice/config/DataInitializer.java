@@ -33,7 +33,7 @@ public class DataInitializer {
                 Project project1 = new Project();
                 project1.setName("Website Redesign");
                 project1.setDescription("Redesign the company website with modern UI/UX");
-                project1.setCompanyId("company-1"); // Sample company ID
+                project1.setCompanyId(1L); // Sample company ID
                 project1.setStartDate(LocalDate.now().minusDays(30));
                 project1.setEndDate(LocalDate.now().plusDays(60));
                 project1.setStatus(ProjectStatus.ACTIVE);
@@ -42,7 +42,7 @@ public class DataInitializer {
                 Project project2 = new Project();
                 project2.setName("Mobile App Development");
                 project2.setDescription("Develop a mobile app for customer engagement");
-                project2.setCompanyId("company-1"); // Sample company ID
+                project2.setCompanyId(1L); // Sample company ID
                 project2.setStartDate(LocalDate.now().minusDays(15));
                 project2.setEndDate(LocalDate.now().plusDays(90));
                 project2.setStatus(ProjectStatus.ACTIVE);

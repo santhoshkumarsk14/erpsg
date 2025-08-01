@@ -20,8 +20,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public List<Project> getAllProjectsForCurrentTenant() {
-        Long companyIdLong = CompanyContext.getCompanyId();
-        String companyId = companyIdLong != null ? companyIdLong.toString() : null;
+        Long companyId = CompanyContext.getCompanyId();
         if (companyId == null) {
             throw new IllegalStateException("Company context not set");
         }
@@ -30,8 +29,7 @@ public class ProjectServiceImpl implements ProjectService {
 
     @Override
     public Project createProject(Project project) {
-        Long companyIdLong = CompanyContext.getCompanyId();
-        String companyId = companyIdLong != null ? companyIdLong.toString() : null;
+        Long companyId = CompanyContext.getCompanyId();
         if (companyId == null) {
             throw new IllegalStateException("Company context not set");
         }
@@ -58,12 +56,12 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> getProjectsByCompanyId(String companyId) {
+    public List<Project> getProjectsByCompanyId(Long companyId) {
         return projectRepository.findByCompanyId(companyId);
     }
 
     @Override
-    public List<Project> getProjectsByCompanyIdAndStatus(String companyId, ProjectStatus status) {
+    public List<Project> getProjectsByCompanyIdAndStatus(Long companyId, ProjectStatus status) {
         return projectRepository.findByCompanyIdAndStatus(companyId, status);
     }
 
@@ -75,7 +73,7 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public boolean existsByNameAndCompanyId(String name, String companyId) {
+    public boolean existsByNameAndCompanyId(String name, Long companyId) {
         return projectRepository.existsByNameAndCompanyId(name, companyId);
     }
 }

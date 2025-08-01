@@ -18,9 +18,10 @@ export interface Timesheet {
   satHr: number;
   sunHr: number;
   totalHr: number;
-  status: 'NOT_CONVERTED' | 'CONVERTED';
+  status: 'PENDING' | 'SUBMITTED' | 'APPROVED' | 'REJECTED';
   createdAt: string;
   updatedAt: string;
+  remarks?: string;
 }
 
 export interface TimesheetCreateRequest {
@@ -71,11 +72,20 @@ export const createTask = (data: any) => api.post('/api/tasks', data);
 export const updateTask = (id: number, data: any) => api.put(`/api/tasks/${id}`, data);
 export const deleteTask = (id: number) => api.delete(`/api/tasks/${id}`);
 
-export const getTimesheets = () => api.get('/api/timesheets');
+export const getProjects = () => api.get('/api/projects');
+export const createProject = (data: any) => api.post('/api/projects', data);
+export const updateProject = (id: number, data: any) => api.put(`/api/projects/${id}`, data);
+export const deleteProject = (id: number) => api.delete(`/api/projects/${id}`);
+
+export const getTasks = () => api.get('/api/tasks');
+export const createTask = (data: any) => api.post('/api/tasks', data);
+export const updateTask = (id: number, data: any) => api.put(`/api/tasks/${id}`, data);
+export const deleteTask = (id: number) => api.delete(`/api/tasks/${id}`);
+
 export const createTimesheet = (data: any) => api.post('/api/timesheets', data);
-export const approveTimesheet = (id: number, approverId: number) => api.post(`/api/timesheets/${id}/approve?approverId=${approverId}`);
-export const rejectTimesheet = (id: number, approverId: number) => api.post(`/api/timesheets/${id}/reject?approverId=${approverId}`);
-export const updateTimesheetStatus = (id: number, status: string) => api.patch(`/api/timesheets/${id}/status?status=${status}`);
+export const approveTimesheet = (id: string, approverId: number, remarks: string) => api.post(`/api/timesheets/${id}/approve?approverId=${approverId}&remarks=${remarks}`);
+export const rejectTimesheet = (id: string, approverId: number, remarks: string) => api.post(`/api/timesheets/${id}/reject?approverId=${approverId}&remarks=${remarks}`);
+export const updateTimesheetStatus = (id: string, status: string) => api.patch(`/api/timesheets/${id}/status?status=${status}`);
 export const downloadTimesheetExcel = (id: string) => api.get(`/api/timesheets/${id}/excel`, { responseType: 'blob' });
 
 const timesheetService = {
@@ -90,7 +100,7 @@ const timesheetService = {
     size?: number;
   }): Promise<{ content: Timesheet[]; totalElements: number; totalPages: number }> => {
     const response = await api.get('/api/timesheets', { params: filters });
-    return response.data;
+    return response.data.data;
   },
   
   // Get timesheet by ID

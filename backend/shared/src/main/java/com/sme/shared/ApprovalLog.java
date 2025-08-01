@@ -1,11 +1,11 @@
 package com.sme.shared;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "status_history_logs")
-public class StatusHistoryLog {
+@Table(name = "approval_logs")
+public class ApprovalLog {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -17,21 +17,18 @@ public class StatusHistoryLog {
     private String parentType; // 'INVOICE', 'QUOTE', 'PO'
 
     @Column(nullable = false)
-    private String oldStatus;
+    private Long approverId;
 
     @Column(nullable = false)
-    private String newStatus;
-
-    @Column(nullable = false)
-    private Long changedBy;
-
-    @Column(nullable = false)
-    private LocalDateTime changedAt;
+    private String action; // APPROVED, REJECTED, SUBMITTED, etc.
 
     private String remarks;
 
-    public StatusHistoryLog() {
-        this.changedAt = LocalDateTime.now();
+    @Column(nullable = false)
+    private LocalDateTime timestamp;
+
+    public ApprovalLog() {
+        this.timestamp = LocalDateTime.now();
     }
 
     // Getters and setters
@@ -41,14 +38,12 @@ public class StatusHistoryLog {
     public void setParentId(Long parentId) { this.parentId = parentId; }
     public String getParentType() { return parentType; }
     public void setParentType(String parentType) { this.parentType = parentType; }
-    public String getOldStatus() { return oldStatus; }
-    public void setOldStatus(String oldStatus) { this.oldStatus = oldStatus; }
-    public String getNewStatus() { return newStatus; }
-    public void setNewStatus(String newStatus) { this.newStatus = newStatus; }
-    public Long getChangedBy() { return changedBy; }
-    public void setChangedBy(Long changedBy) { this.changedBy = changedBy; }
-    public LocalDateTime getChangedAt() { return changedAt; }
-    public void setChangedAt(LocalDateTime changedAt) { this.changedAt = changedAt; }
+    public Long getApproverId() { return approverId; }
+    public void setApproverId(Long approverId) { this.approverId = approverId; }
+    public String getAction() { return action; }
+    public void setAction(String action) { this.action = action; }
     public String getRemarks() { return remarks; }
     public void setRemarks(String remarks) { this.remarks = remarks; }
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 } 

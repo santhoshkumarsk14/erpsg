@@ -67,7 +67,7 @@ public class AuthController {
             user.setTwoFaTempCode(code);
             user.setTwoFaTempExpiry(LocalDateTime.now().plusMinutes(10));
             userRepository.save(user);
-            auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "2FA_CODE_SENT", null, null, java.time.LocalDateTime.now()));
+            auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "2FA_CODE_SENT", null, null, java.time.LocalDateTime.now(), null));
             if (mailSender != null) {
                 SimpleMailMessage message = new SimpleMailMessage();
                 message.setTo(user.getEmail());
@@ -83,7 +83,7 @@ public class AuthController {
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
         String jwt = jwtUtils.generateJwtToken(authentication);
-        auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "LOGIN", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "LOGIN", null, null, java.time.LocalDateTime.now(), null));
 
         UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
         List<String> roles = userDetails.getAuthorities().stream()
@@ -113,7 +113,7 @@ public class AuthController {
         user.setTwoFaTempCode(null);
         user.setTwoFaTempExpiry(null);
         userRepository.save(user);
-        auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "2FA_VERIFIED", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "2FA_VERIFIED", null, null, java.time.LocalDateTime.now(), null));
         // Authenticate and return JWT
         Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(username, "2fa-bypass")); // password is not checked here
@@ -196,7 +196,7 @@ public class AuthController {
 
         user.setRoles(roles);
         userRepository.save(user);
-        auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "REGISTER", null, null, java.time.LocalDateTime.now()));
+        auditLogRepository.save(new AuditLog(null, user != null ? user.getCompanyId() : null, user != null ? (user.getId() != null ? user.getId() : null) : null, "USER", null, "REGISTER", null, null, java.time.LocalDateTime.now(), null));
 
         // After successful registration, authenticate the user and return JWT
         Authentication authentication = authenticationManager.authenticate(

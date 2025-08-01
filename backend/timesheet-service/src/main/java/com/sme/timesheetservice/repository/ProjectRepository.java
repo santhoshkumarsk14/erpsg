@@ -10,9 +10,9 @@ import java.util.List;
 @Repository
 public interface ProjectRepository extends JpaRepository<Project, String> {
     
-    List<Project> findByCompanyId(String companyId);
+    List<Project> findByCompanyId(Long companyId);
     
-    List<Project> findByCompanyIdAndStatus(String companyId, ProjectStatus status);
+    List<Project> findByCompanyIdAndStatus(Long companyId, ProjectStatus status);
     
-    boolean existsByNameAndCompanyId(String name, String companyId);
+    boolean existsByNameAndCompanyId(String name, Long companyId);
 }
